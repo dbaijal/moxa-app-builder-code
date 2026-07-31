@@ -1,0 +1,69 @@
+application:
+  actions: actions
+  web: web-src
+  runtimeManifest:
+    packages:
+      moxademopoc:
+        license: Apache-2.0
+        actions:
+          generic:
+            function: actions/generic/index.js
+            web: 'no'
+            runtime: nodejs:22
+            inputs:
+              LOG_LEVEL: debug
+              SENDGRID_API_KEY: $SENDGRID_API_KEY
+            annotations:
+              require-adobe-auth: false
+              final: true
+          series-cf-trigger:
+            function: actions/series-cf-trigger/index.js
+            web: 'no'
+            runtime: nodejs:22
+            inputs:
+              LOG_LEVEL: debug
+              CF_BASE_PATH: /content/dam/moxa-poc/content-fragment/
+              AEM_PUBLISH_URL: https://publish-p170892-e1840404.adobeaemcloud.com
+              SENDGRID_API_KEY: $SENDGRID_API_KEY
+              # Same PDIM API data-provider uses - needed here to determine
+              # which model pages exist under a series when its CF publishes.
+              PDIM_API_BASE_URL: https://moxaservicepoc-e8eqb0fjd4gud0fm.a02.azurefd.net
+              PDIM_API_KEY: $PDIM_API_KEY
+              # Helix Admin API coordinates for triggering preview/publish
+              # (admin.hlx.page/{preview|live}/{org}/{site}/{ref}{path}).
+              HELIX_ORG: dbaijal
+              HELIX_SITE: moxa-poc
+              HELIX_REF: main
+              HELIX_ADMIN_TOKEN: $HELIX_ADMIN_TOKEN
+            annotations:
+              require-adobe-auth: false
+              final: true
+          data-provider:
+            function: actions/data-provider/index.js
+            web: 'raw'
+            runtime: nodejs:22
+            inputs:
+              LOG_LEVEL: debug
+              # Not secrets - kept here (not .env) so there's exactly one place to
+              # change them without touching index.js.
+              CF_BASE_PATH: /content/dam/moxa-poc/content-fragment/
+              AEM_PUBLISH_URL: https://publish-p170892-e1840404.adobeaemcloud.com
+              # Real Moxa PDIM product API (series/model data), replacing the
+              # GraphQL/CF lookup above for these two page types.
+              PDIM_API_BASE_URL: https://moxaservicepoc-e8eqb0fjd4gud0fm.a02.azurefd.net
+              PDIM_API_KEY: $PDIM_API_KEY
+            annotations:
+              require-adobe-auth: false
+              final: true
+            include:
+              - ["actions/data-provider/templates/*.html", "templates/"]
+          publish-events:
+            function: actions/publish-events/index.js
+            web: 'yes'
+            runtime: nodejs:22
+            inputs:
+              LOG_LEVEL: debug
+              apiKey: $SERVICE_API_KEY
+            annotations:
+              require-adobe-auth: true
+              final: true

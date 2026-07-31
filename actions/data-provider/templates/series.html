@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Series Page</title>
+  </head>
+  <body>
+    <header></header>
+    <main>
+      <div>
+        <div class="product-banner">
+          <div>
+            <div>{{banner.heading}}</div>
+          </div>
+          <div>
+            <div>{{banner.description}}</div>
+          </div>
+          <div>
+            <div>
+              <p>Features and advantages</p>
+              <ul>
+                {{#each features}}
+                <li>{{this}}</li>
+                {{/each}}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="product-viewer">
+          <div>
+            <div>
+              <p>Features and advantages</p>
+              <ul>
+                {{#each features}}
+                <li>{{this}}</li>
+                {{/each}}
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div>
+              <ul>
+                {{#each images}}
+                <li>
+                  <picture>
+                    <img src="{{this}}" alt="">
+                  </picture>
+                </li>
+                {{/each}}
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div>Certification</div>
+          </div>
+          <div>
+            <div>
+              <ul>
+                {{#each certifications}}
+                <li>
+                  <picture>
+                    <img src="{{this}}" alt="">
+                  </picture>
+                </li>
+                {{/each}}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <pre>{{json}}</pre>
+    </main>
+    <footer></footer>
+  </body>
+</html>
