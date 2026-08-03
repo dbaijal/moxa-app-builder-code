@@ -16,6 +16,20 @@ application:
             annotations:
               require-adobe-auth: false
               final: true
+          article-page-notify:
+            function: actions/article-page-notify/index.js
+            web: 'no'
+            runtime: nodejs:22
+            inputs:
+              LOG_LEVEL: debug
+              # Only pages under this path are treated as "article" pages and
+              # trigger an email; every other page publish is skipped. Set this
+              # to the section your article pages live under.
+              ARTICLE_PATH_PREFIX: /content/moxa-poc/en/articles/
+              SENDGRID_API_KEY: $SENDGRID_API_KEY
+            annotations:
+              require-adobe-auth: false
+              final: true
           series-cf-trigger:
             function: actions/series-cf-trigger/index.js
             web: 'no'
