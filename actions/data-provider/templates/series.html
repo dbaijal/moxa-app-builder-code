@@ -42,6 +42,7 @@
               </ul>
             </div>
           </div>
+          {{#if certifications.length}}
           <div>
             <div>Certification</div>
           </div>
@@ -58,6 +59,7 @@
               </ul>
             </div>
           </div>
+          {{/if}}
         </div>
       </div>
       <div>
@@ -84,7 +86,7 @@
           </div>
         </div>
       </div>
-      <div class="pdp-container">
+      <div>
         <div class="product-overview">
           <div>
             <div>Overview</div>
@@ -109,8 +111,14 @@
             <div>Save to My Moxa</div>
           </div>
         </div>
+        <div class="section-metadata">
+          <div>
+            <div>style</div>
+            <div>pdp-container</div>
+          </div>
+        </div>
       </div>
-      <div class="pdp-container">
+      <div>
         <div class="product-specification">
           {{#each specs}}
           <div>
@@ -136,8 +144,15 @@
           </div>
           {{/each}}
         </div>
+        <div class="section-metadata">
+          <div>
+            <div>style</div>
+            <div>pdp-container</div>
+          </div>
+        </div>
       </div>
-      <div class="pdp-container">
+      {{#if resources.length}}
+      <div>
         <div class="product-resource">
           <div>
             <div>Resources</div>
@@ -163,8 +178,16 @@
             </div>
           </div>
         </div>
+        <div class="section-metadata">
+          <div>
+            <div>style</div>
+            <div>pdp-container</div>
+          </div>
+        </div>
       </div>
-      <div class="pdp-container">
+      {{/if}}
+      {{#if modelComparison.totalModels}}
+      <div>
         <div class="product-model">
           <div>
             <div>Available models ({{modelComparison.totalModels}})</div>
@@ -176,7 +199,7 @@
                   <tr>
                     <td></td>
                     {{#each modelComparison.columns}}
-                    <td>{{#if link}}<a href="{{link}}">{{modelName}}</a>{{else}}{{modelName}}{{/if}}</td>
+                    <td><a href="{{#if link}}{{link}}{{else}}#{{/if}}">{{modelName}}</a></td>
                     {{/each}}
                   </tr>
                   {{#each modelComparison.rows}}
@@ -192,7 +215,14 @@
             </div>
           </div>
         </div>
+        <div class="section-metadata">
+          <div>
+            <div>style</div>
+            <div>pdp-container</div>
+          </div>
+        </div>
       </div>
+      {{/if}}
       <pre>{{json}}</pre>
     </main>
     <footer></footer>

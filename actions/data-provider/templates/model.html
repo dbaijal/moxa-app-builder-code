@@ -7,25 +7,82 @@
     <header></header>
     <main>
       <div>
-        <div class="hero">
+        <div class="product-banner product">
+          <div>
+            <div>{{modelPageHeader.heading}}</div>
+          </div>
+          <div>
+            <div></div>
+          </div>
+          <div>
+            <div>{{modelPageHeader.description}}</div>
+          </div>
           <div>
             <div>
-              <h1>{{modelName}}</h1>
-              <p>{{description}}</p>
-              <h2>{{modelPageHeader.heading}}</h2>
-              <p>{{modelPageHeader.description}}</p>
-            </div>
-            <!--
-            <div>
               <picture>
-                <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80" alt="Sample model hero image">
+                <source type="image/webp" srcset="./media_17397c38eef8ce6fad80801c30fd94dce8cd2cb85.jpg?width=2000&#x26;format=webply&#x26;optimize=medium" media="(min-width: 600px)">
+                <source type="image/webp" srcset="./media_17397c38eef8ce6fad80801c30fd94dce8cd2cb85.jpg?width=750&#x26;format=webply&#x26;optimize=medium">
+                <source type="image/jpeg" srcset="./media_17397c38eef8ce6fad80801c30fd94dce8cd2cb85.jpg?width=2000&#x26;format=jpg&#x26;optimize=medium" media="(min-width: 600px)">
+                <img loading="lazy" alt="" src="./media_17397c38eef8ce6fad80801c30fd94dce8cd2cb85.jpg?width=750&#x26;format=jpg&#x26;optimize=medium" width="366" height="170">
               </picture>
             </div>
-            -->
           </div>
         </div>
       </div>
-      <pre>{{json}}</pre>
+      <div>
+        <div class="series-card">
+          <div>
+            <div>
+              <picture>
+                <img src="{{heroImage}}" alt="">
+              </picture>
+            </div>
+          </div>
+          <div>
+            <div>{{modelName}}</div>
+          </div>
+          <div>
+            <div><a href="{{series.link}}">{{series.name}}</a></div>
+          </div>
+          <div>
+            <div>{{description}}</div>
+          </div>
+          <div>
+            <div>
+              <table>
+                <tbody>
+                  {{#each specs}}
+                  {{#each items}}
+                  <tr>
+                    {{#if @first}}
+                    <td rowspan="{{../items.length}}">{{../category}}</td>
+                    {{/if}}
+                    <td>{{key}}</td>
+                    <td>
+                      <ul>
+                        {{#each text}}
+                        <li>{{{this}}}</li>
+                        {{/each}}
+                      </ul>
+                    </td>
+                  </tr>
+                  {{/each}}
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div><a href="{{downloadLink.url}}">{{downloadLink.text}}</a></div>
+          </div>
+        </div>
+        <div class="section-metadata">
+          <div>
+            <div>style</div>
+            <div>pdp-container</div>
+          </div>
+        </div>
+      </div>
     </main>
     <footer></footer>
   </body>
