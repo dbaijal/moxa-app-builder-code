@@ -15,14 +15,7 @@
             <div>{{banner.description}}</div>
           </div>
           <div>
-            <div>
-              <p>Features and advantages</p>
-              <ul>
-                {{#each features}}
-                <li>{{this}}</li>
-                {{/each}}
-              </ul>
-            </div>
+            <div></div>
           </div>
         </div>
         <div class="product-viewer">
@@ -63,6 +56,139 @@
                 </li>
                 {{/each}}
               </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="page-navigation">
+          <div>
+            <div><a href="#product-overview">#product-overview</a></div>
+            <div>Overview</div>
+            <div></div>
+          </div>
+          <div>
+            <div><a href="#product-specification">#product-specification</a></div>
+            <div>Specification</div>
+            <div></div>
+          </div>
+          <div>
+            <div><a href="#product-resource">#product-resource</a></div>
+            <div>Resource</div>
+            <div></div>
+          </div>
+          <div>
+            <div><a href="#product-model">#product-model</a></div>
+            <div>Model</div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+      <div class="pdp-container">
+        <div class="product-overview">
+          <div>
+            <div>Overview</div>
+          </div>
+          <div>
+            <div>
+              {{#each overview}}
+              <h3><strong>{{heading}}</strong></h3>
+              {{#each text}}
+              <p>{{this}}</p>
+              {{/each}}
+              {{/each}}
+            </div>
+          </div>
+          <div>
+            <div>Download product information sheet</div>
+          </div>
+          <div>
+            <div>Print this page</div>
+          </div>
+          <div>
+            <div>Save to My Moxa</div>
+          </div>
+        </div>
+      </div>
+      <div class="pdp-container">
+        <div class="product-specification">
+          {{#each specs}}
+          <div>
+            <div>{{category}}</div>
+            <div>
+              <table>
+                <tbody>
+                  {{#each items}}
+                  <tr>
+                    <td>{{key}}</td>
+                    <td>
+                      <ul>
+                        {{#each text}}
+                        <li>{{{this}}}</li>
+                        {{/each}}
+                      </ul>
+                    </td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+      <div class="pdp-container">
+        <div class="product-resource">
+          <div>
+            <div>Resources</div>
+            <div>
+              <table>
+                <tbody>
+                  <tr>
+                    <td>NAME</td>
+                    <td>TYPE</td>
+                    <td>VERSION</td>
+                    <td>RELEASE DATE</td>
+                  </tr>
+                  {{#each resources}}
+                  <tr>
+                    <td><a href="{{assetLink}}">{{name}}</a></td>
+                    <td>{{type}}</td>
+                    <td>{{version}}</td>
+                    <td>{{releaseDate}}</td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pdp-container">
+        <div class="product-model">
+          <div>
+            <div>Available models ({{modelComparison.totalModels}})</div>
+          </div>
+          <div>
+            <div>
+              <table>
+                <tbody>
+                  <tr>
+                    <td></td>
+                    {{#each modelComparison.columns}}
+                    <td>{{#if link}}<a href="{{link}}">{{modelName}}</a>{{else}}{{modelName}}{{/if}}</td>
+                    {{/each}}
+                  </tr>
+                  {{#each modelComparison.rows}}
+                  <tr>
+                    <td>{{key}}</td>
+                    {{#each values}}
+                    <td>{{this}}</td>
+                    {{/each}}
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
