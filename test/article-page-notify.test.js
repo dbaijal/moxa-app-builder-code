@@ -27,13 +27,17 @@ beforeEach(() => {
   sendEmail.mockReset()
 })
 
+const ARTICLE_TEMPLATE = '/conf/moxa-poc/settings/wcm/templates/article-sample-template'
+
 // A realistic page-published event payload for an article page.
 const articleEvent = {
-  ARTICLE_PATH_PREFIX: '/content/moxa-poc/en/articles/',
+  ARTICLE_TEMPLATE,
+  AEM_AUTHOR_URL: 'https://author-p170892-e1840404.adobeaemcloud.com',
   SENDGRID_API_KEY: 'fake-key',
   time: '2026-08-03T08:47:36.249368067Z',
   data: {
     path: '/content/moxa-poc/en/articles/my-article',
+    template: { id: ARTICLE_TEMPLATE },
     tier: 'publish',
     user: { displayName: 'Deepti Baijal', principalId: 'dbaijal@adobe.com' }
   }
@@ -58,15 +62,17 @@ describe('article-page-notify', () => {
     const arg = sendEmail.mock.calls[0][0]
     expect(arg.to).toContain('dbaijal@adobe.com')
     expect(arg.subject).toContain('/content/moxa-poc/en/articles/my-article')
+    // body carries the full clickable author (edit) URL, not just the raw path
+    expect(arg.text).toContain('https://author-p170892-e1840404.adobeaemcloud.com/editor.html/content/moxa-poc/en/articles/my-article.html')
     expect(response.statusCode).toBe(200)
     expect(response.body.message).toBe('processed')
     expect(response.body.emailResult).toEqual({ ok: true, status: 202, body: null })
   })
 
-  test('skips (no email) when the published page is NOT under the article prefix', async () => {
+  test('skips (no email) when the published page uses a different template', async () => {
     const response = await action.main({
       ...articleEvent,
-      data: { ...articleEvent.data, path: '/content/moxa-poc/en/products/eds-4008-series' }
+      data: { ...articleEvent.data, template: { id: '/conf/moxa-poc/settings/wcm/templates/product-page' } }
     })
 
     expect(sendEmail).not.toHaveBeenCalled()
@@ -74,8 +80,18 @@ describe('article-page-notify', () => {
     expect(response.body.message).toBe('skipped - not an article page')
   })
 
-  test('skips when ARTICLE_PATH_PREFIX is not configured', async () => {
-    const response = await action.main({ ...articleEvent, ARTICLE_PATH_PREFIX: undefined })
+  test('skips when the page has no template on the event', async () => {
+    const response = await action.main({
+      ...articleEvent,
+      data: { ...articleEvent.data, template: undefined }
+    })
+
+    expect(sendEmail).not.toHaveBeenCalled()
+    expect(response.body.message).toBe('skipped - not an article page')
+  })
+
+  test('skips when ARTICLE_TEMPLATE is not configured', async () => {
+    const response = await action.main({ ...articleEvent, ARTICLE_TEMPLATE: undefined })
 
     expect(sendEmail).not.toHaveBeenCalled()
     expect(response.body.message).toBe('skipped - not an article page')

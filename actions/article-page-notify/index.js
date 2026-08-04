@@ -15,26 +15,26 @@
  * On every page-published event, IF the page is an "article" page, sends a
  * notification email via SendGrid to every address in NOTIFY_EMAILS below.
  *
- * "Article" detection: a page carries no CF-style "model" field, so there is
- * nothing on the event payload that says "this is an article". We scope by
- * PATH PREFIX instead (ARTICLE_PATH_PREFIX input) - the same approach
- * series-cf-trigger uses to scope the shared CF event to Moxa series CFs. The
- * page-published event fires for EVERY page publish across the instance, so
- * anything outside that prefix is skipped (200, no error). To scope by
- * template instead, you'd need an extra fetch to the publish tier to read the
- * page's cq:template - deliberately not done here to keep the POC simple.
+ * "Article" detection: the page-published event payload includes the page's
+ * template at data.template.id, so we scope by TEMPLATE (ARTICLE_TEMPLATE
+ * input) rather than by path. This is more precise than a path prefix and
+ * immune to content being reorganized under a different path - at NO extra
+ * cost, since the template id is right there on the event (no AEM lookup
+ * needed). The event fires for EVERY page publish across the instance, so any
+ * page whose template doesn't match is skipped (200, no error).
  *
- * Expected event shape (mirrors the confirmed CF payload; `time` is top-level,
- * the page data is under `data`):
+ * Confirmed event shape (captured from a real activation; `time` is top-level
+ * on the CloudEvents envelope, the page data is under `data`):
  * {
  *   type: "aem.sites.page.published",
+ *   time: "2026-08-03T10:14:16.052154707Z",
  *   data: {
- *     path: "/content/<site>/<lang>/articles/my-article",
+ *     path: "/content/moxa-poc/en/articles/my-article",
+ *     template: { id: "/conf/moxa-poc/settings/wcm/templates/article-sample-template" },
  *     tier: "publish",
- *     sourceUrl: "https://author-....adobeaemcloud.com",
- *     user: { displayName: "...", principalId: "...@adobe.com" }
- *   },
- *   time: "2026-08-03T08:47:36.249368067Z"
+ *     sourceUrl: "https://publish-....adobeaemcloud.com",   // NOTE: publish host, not author
+ *     user: { displayName: "...", principalId: "...@adobe.com", imsUserId: "..." }
+ *   }
  * }
  *
  * Uses the shared SendGrid sender (lib/email.js) with a Gmail FROM_EMAIL, NOT
@@ -59,23 +59,33 @@ const NOTIFY_EMAILS = [
 const FROM_EMAIL = 'baijal.deepti20@gmail.com' // must match your verified Single Sender in SendGrid
 const FROM_NAME = 'AEM Page Notifications'
 
-// True only if this published page is an article page. Kept trivial and pure
-// so it's easy to unit test. Empty/undefined prefix -> nothing matches (safer
-// than emailing on every page publish if the input is ever misconfigured).
-function isArticlePage (path, prefix) {
-  return Boolean(path) && Boolean(prefix) && path.startsWith(prefix)
+// True only if this published page's template matches the configured article
+// template. The template id is on the event payload at data.template.id.
+// Kept trivial and pure so it's easy to unit test. Empty/undefined configured
+// template -> nothing matches (safer than emailing on every page publish if
+// the input is ever misconfigured).
+function isArticlePage (event, articleTemplate) {
+  return Boolean(articleTemplate) && event?.template?.id === articleTemplate
 }
 
-function buildEmail (event, publishedAt) {
+function buildEmail (event, publishedAt, authorUrl) {
   const pagePath = event.path || '(unknown path)'
   const publishedBy = event.user?.displayName || event.user?.principalId || '(unknown user)'
   publishedAt = publishedAt || '(unknown time)'
+
+  // Full clickable author (edit) URL, e.g.
+  // https://author-....adobeaemcloud.com/editor.html/content/.../my-article.html
+  // The email is plain text, so mail clients auto-linkify the bare URL. Fall
+  // back to the raw path if the author host isn't configured or path is unknown.
+  const pageLink = (authorUrl && event.path)
+    ? `${authorUrl}/editor.html${pagePath}.html`
+    : pagePath
 
   const subject = `Article Page Published: ${pagePath}`
   const text = [
     'An article page was published in AEM Sites.',
     '',
-    `Path:          ${pagePath}`,
+    `Page:          ${pageLink}`,
     `Published by:  ${publishedBy}`,
     `Published at:  ${publishedAt}`,
   ].join('\n')
@@ -94,16 +104,17 @@ async function main (params) {
     // params.data is the actual AEM page event payload; params.time is top-level.
     const event = params.data || {}
     const pagePath = event.path || ''
+    const templateId = event.template?.id
 
-    // The page-published event fires for ANY page publish - skip anything that
-    // isn't an article page (200, no error, so it isn't retried/flagged).
-    if (!isArticlePage(pagePath, params.ARTICLE_PATH_PREFIX)) {
-      logger.info(`${pagePath || '(no path)'} is not an article page (prefix ${params.ARTICLE_PATH_PREFIX}) - skipping`)
-      return { statusCode: 200, body: { message: 'skipped - not an article page', path: pagePath } }
+    // The page-published event fires for ANY page publish - skip anything whose
+    // template isn't the article template (200, no error, so it isn't retried).
+    if (!isArticlePage(event, params.ARTICLE_TEMPLATE)) {
+      logger.info(`${pagePath || '(no path)'} template ${templateId} != ${params.ARTICLE_TEMPLATE} - skipping`)
+      return { statusCode: 200, body: { message: 'skipped - not an article page', path: pagePath, template: templateId } }
     }
 
     logger.info(`Article page published: ${pagePath}`)
-    const { subject, text } = buildEmail(event, params.time)
+    const { subject, text } = buildEmail(event, params.time, params.AEM_AUTHOR_URL)
 
     let emailResult = { skipped: true }
     if (params.SENDGRID_API_KEY) {

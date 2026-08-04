@@ -22,10 +22,12 @@ application:
             runtime: nodejs:22
             inputs:
               LOG_LEVEL: debug
-              # Only pages under this path are treated as "article" pages and
-              # trigger an email; every other page publish is skipped. Set this
-              # to the section your article pages live under.
-              ARTICLE_PATH_PREFIX: /content/moxa-poc/en/articles/
+              # A page is an "article" if its template (data.template.id on the
+              # page-published event) matches this exactly; every other page
+              # publish is skipped.
+              ARTICLE_TEMPLATE: /conf/moxa-poc/settings/wcm/templates/article-sample-template
+              # Author host used to build the clickable page link in the email.
+              AEM_AUTHOR_URL: https://author-p170892-e1840404.adobeaemcloud.com
               SENDGRID_API_KEY: $SENDGRID_API_KEY
             annotations:
               require-adobe-auth: false
