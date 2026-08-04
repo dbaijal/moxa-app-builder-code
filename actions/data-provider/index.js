@@ -280,6 +280,7 @@ async function main (params) {
       content.modelPageHeader = {
         heading: cfItem.modelPageHeaderText,
         description: cfItem.modelPageHeaderDesc?.plaintext || null,
+        image: cfItem.modelPageHeaderImage?._path ? `${params.AEM_PUBLISH_URL}${cfItem.modelPageHeaderImage._path}` : null,
       }
     }
 

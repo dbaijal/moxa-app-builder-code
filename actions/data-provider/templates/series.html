@@ -74,16 +74,20 @@
             <div>Specification</div>
             <div></div>
           </div>
+          {{#if resources.length}}
           <div>
             <div><a href="#product-resource">#product-resource</a></div>
             <div>Resource</div>
             <div></div>
           </div>
+          {{/if}}
+          {{#if modelComparison.totalModels}}
           <div>
             <div><a href="#product-model">#product-model</a></div>
             <div>Model</div>
             <div></div>
           </div>
+          {{/if}}
         </div>
       </div>
       <div>
@@ -102,7 +106,7 @@
             </div>
           </div>
           <div>
-            <div>Download product information sheet</div>
+            <div><a href="{{downloadLink.url}}">{{downloadLink.text}}</a></div>
           </div>
           <div>
             <div>Print this page</div>
@@ -156,7 +160,9 @@
         <div class="product-resource">
           <div>
             <div>Resources</div>
-            <div>
+            <div></div>
+            <div></div>
+            <div>              
               <table>
                 <tbody>
                   <tr>
@@ -190,7 +196,7 @@
       <div>
         <div class="product-model">
           <div>
-            <div>Available models ({{modelComparison.totalModels}})</div>
+            <div>Available models</div>
           </div>
           <div>
             <div>
